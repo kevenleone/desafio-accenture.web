@@ -1,5 +1,5 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-https://travis-ci.org/kevenleone/desafio-accenture.web.svg?branch=master
+<img src="https://travis-ci.org/kevenleone/desafio-accenture.web.svg?branch=master"></img>
 ## Available Scripts
 
 In the project directory, you can run:
