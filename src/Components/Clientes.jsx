@@ -1,20 +1,22 @@
 import React, { Component } from 'react'
 import Grid from './Grid';
-import Modal from './Modal'
+import ModalClient from './ModalClient'
 import ModalBTN from './ModalBtn'
 import API from './Helper/API'
 import Alert from './Alert'
-
+import Utils from './Helper/Utils';
 export default class Clientes extends Component {
 
     constructor() {
         super();
         this.state = {
-            nome: '',
-            nascimento: '',
-            cpf: '',
-            telefone: '',
-            email: '',
+            nome: {value: '', valid: true},
+            nascimento: {value: '', valid: true},
+            cpf: {value: '', valid: true},
+            telefone: {value: '', valid: true},
+            email: {value: '', valid: true},
+            clientSearch : {value: ''},
+            searchMessageError: 'Não possuem clientes cadastrados na base de dados.',
             formError: false,
             clientes : []
         }
@@ -26,30 +28,23 @@ export default class Clientes extends Component {
     componentDidMount(){
         this.handleSearch();
     }
-
+    
     handleChange(e) {
-        var target = e.target.name
-        var value = e.target.value
-
-        this.setState({
-            [target]: value
-        })
+        let target = e.target.name
+        let state = this.state;
+        state[target].value = e.target.value; 
+        this.setState(state)
     }
 
-    ClientData(){
-        return {
-            nome: this.state.nome,
-            nascimento: this.state.nascimento,
-            email: this.state.email,
-            telefone: this.state.telefone,
-            cpf: this.state.cpf
-        }
-    }
-
-   async handleSearch(criteria = ''){
+   async handleSearch(e = null, criteria = ''){
+       let search = ''
+       if(e){ e.preventDefault()}
+       if(criteria !== ''){
+           search = `search/${criteria}`
+       }
         try {
-            const clientes = await API.get(`/cliente/${criteria}`);
-            this.setState({clientes: clientes.data});
+            const clientes = await API.get(`/cliente/${search}`);
+            this.setState({clientes: clientes.data, searchMessageError: `Não foi possível encontrar ${criteria} na base de dados`});
         } catch {
             console.log('Nao foi possível se conectar a API')
         }
@@ -60,18 +55,17 @@ export default class Clientes extends Component {
             API.delete(`/cliente/${cliente.id}`).then(data => {
                 window.location.reload();
             }).catch(err => {
-                alert("Erro ao remover cliente...");
+                window.location.reload();
             })
         }
-        
     }
 
     handleSubmit(e){
         e.preventDefault();
         console.log(this.state.nome, this.state.email, this.state.nascimento, this.state.cpf, this.state.telefone);
 
-        if(this.validateForm()){
-            API.post(`/cliente`, this.ClientData()).then(data => {
+        if(Utils.validateForm(this.state)){
+            API.post(`/cliente`, Utils.ClientData(this.state)).then(data => {
                 alert("Cliente Cadastrado!");
                 window.location.reload();
             }).catch(err => {
@@ -83,20 +77,8 @@ export default class Clientes extends Component {
         }
     }
 
-    isValid(data){
-        if(data === "" || data === null || data === undefined){
-            return false;
-        } 
-
-        return true;
-    }
-
-    validateForm(){
-        if(this.isValid(this.state.nome) && this.isValid(this.state.email) && this.isValid(this.state.cpf) && this.isValid(this.state.nascimento) && this.isValid(this.state.email)){
-            return true;
-        } else {
-            return false;
-        }
+    Goto(cliente){
+        window.location.href = `clientes/${cliente.id}`
     }
 
     render() {
@@ -109,7 +91,18 @@ export default class Clientes extends Component {
                     </div>
                 </Grid>
                 <Grid cols="12 12 6">
-                    <ModalBTN text="Novo Cliente" id="client" /> <br /> <br />
+                    <div className="row">
+                    <Grid cols="10">
+                        <ModalBTN color="primary" icon="user" text="Novo Cliente" id="client" /> <br /> <br />
+                    </Grid>
+                    <form className="form-inline">
+                    <div className="form-group mx-sm-3 mb-2">
+                        <input type="text" value={this.state.clientSearch.value} name="clientSearch" onChange={this.handleChange} className="form-control col-md-12" placeholder="ex: Cirilo"/>
+                    </div>
+                    <button onClick={(e) => this.handleSearch(e, this.state.clientSearch.value)}  className="btn btn-primary mb-2">Buscar</button>
+                    </form>
+                    
+                    </div>
                     {
                         this.state.clientes.length > 0 ? 
                         <table className="table table-striped">
@@ -133,6 +126,7 @@ export default class Clientes extends Component {
                                 <td>{cliente.telefone}</td>
                                 <td>{cliente.email}</td>
                                 <td>
+                                <button onClick={() => this.Goto(cliente)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
                                 <button className="btn btn-primary" title="Editar"><i className="fa fa-pencil"></i></button> &ensp;
                                 <button onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
                                 </td>
@@ -143,37 +137,12 @@ export default class Clientes extends Component {
                     </table>
                     :
                     <Alert color="info" title="Oops..." icon="exclamation-triangle" text="Não possuem usuários cadastrados...">
-                        <p>Não possuem clientes cadastrados na base de dados.</p>
+                        <p>{this.state.searchMessageError}</p>
                     </Alert>
                     }
                     
                 </Grid>
-                <Modal handleSubmit={this.handleSubmit} id="client" title="Novo Cliente">
-                    <div className="col-md-12">
-                        <div className="row">
-                        <Grid classes="form-group" cols="6 6 12">
-                        <label>Nome</label>
-                            <input name="nome" value={this.state.nome} onChange={this.handleChange} type="text" className="form-control"/>
-                        </Grid>
-                        <Grid classes="form-group" cols="6 6 12">
-                        <label>Endereço Email</label>
-                            <input name="email" value={this.state.email} onChange={this.handleChange} type="email" className="form-control"/>
-                        </Grid>
-                        <Grid classes="form-group" cols="4 6 12">
-                        <label>CPF</label>
-                            <input name="cpf" value={this.state.cpf} onChange={this.handleChange} type="text" className="form-control"/>
-                        </Grid>
-                        <Grid classes="form-group" cols="4 6 12">
-                        <label>Telefone</label>
-                            <input name="telefone" value={this.state.telefone} onChange={this.handleChange} type="text" className="form-control"/>
-                        </Grid>
-                        <Grid classes="form-group" cols="4 6 12">
-                        <label>Nascimento</label>
-                            <input name="nascimento" value={this.state.nascimento} onChange={this.handleChange} type="date" className="form-control"/>
-                        </Grid>
-                        </div>
-                    </div>
-                </Modal>
+                <ModalClient data={this.state} handleChange={this.handleChange} handleSubmit={this.handleSubmit} id="client" title="Novo Cliente" />
             </div>
         )
     }
