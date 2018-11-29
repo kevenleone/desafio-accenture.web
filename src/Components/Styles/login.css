@@ -1,0 +1,18 @@
+.loginPanel {
+    width: 350px;
+    padding: 8% 0 0;
+    margin: auto;
+  }
+
+.valid {
+    border-color: #28a745;
+}
+
+.alert-error{
+  margin-top: 1%;
+  color: #dc3545;
+}
+
+.invalid {
+  border-color: #dc3545;
+}

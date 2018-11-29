@@ -5,6 +5,7 @@ import ModalBTN from './ModalBtn'
 import API from './Helper/API'
 import Alert from './Alert'
 import Utils from './Helper/Utils';
+import Loading from './Loading'
 export default class Clientes extends Component {
 
     constructor() {
@@ -18,7 +19,8 @@ export default class Clientes extends Component {
             clientSearch : {value: ''},
             searchMessageError: 'Não possuem clientes cadastrados na base de dados.',
             formError: false,
-            clientes : []
+            clientes : [],
+            loaded: false
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -44,7 +46,7 @@ export default class Clientes extends Component {
        }
         try {
             const clientes = await API.get(`/cliente/${search}`);
-            this.setState({clientes: clientes.data, searchMessageError: `Não foi possível encontrar ${criteria} na base de dados`});
+            this.setState({clientes: clientes.data, loaded: true, searchMessageError: `Não foi possível encontrar ${criteria} na base de dados`});
         } catch {
             console.log('Nao foi possível se conectar a API')
         }
@@ -86,7 +88,7 @@ export default class Clientes extends Component {
             <div>
                 <Grid cols="12">
                     <div className="jumbotron">
-                        <h1 className="display-4">Bem vindo, Usuário...</h1>
+                        <h3 className="display-5">Bem vindo, {Utils.getUser()}</h3>
                         <p className="lead">A partir dessa página você poderá gerenciar o perfil dos clientes, cadastrar, remover e altera-los.</p>
                     </div>
                 </Grid>
@@ -104,41 +106,40 @@ export default class Clientes extends Component {
                     
                     </div>
                     {
-                        this.state.clientes.length > 0 ? 
-                        <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nome Completo</th>
-                                <th>Idade</th>
-                                <th>CPF</th>
-                                <th>Telefone</th>
-                                <th>E-mail</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        this.state.loaded ? <div>
                         {
-                            this.state.clientes.map(cliente => (
-                            <tr key={cliente.id}>
-                                <td>{cliente.nome}</td>
-                                <td>{cliente.nascimento}</td>
-                                <td>{cliente.cpf}</td>
-                                <td>{cliente.telefone}</td>
-                                <td>{cliente.email}</td>
-                                <td>
-                                <button onClick={() => this.Goto(cliente)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
-                                <button className="btn btn-primary" title="Editar"><i className="fa fa-pencil"></i></button> &ensp;
-                                <button onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            ))
+                            this.state.clientes.length > 0 ? 
+                            <table className="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Primeiro Nome</th>
+                                    <th>Telefone</th>
+                                    <th>E-mail</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {
+                                this.state.clientes.map(cliente => (
+                                <tr key={cliente.id}>
+                                    <td>{Utils.getFirstName(cliente.nome)}</td>
+                                    <td>{cliente.telefone}</td>
+                                    <td>{cliente.email}</td>
+                                    <td>
+                                    <button onClick={() => this.Goto(cliente)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
+                                    <button onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                ))
+                            }
+                            </tbody>
+                        </table>
+                        :
+                        <Alert color="info" title="Oops..." icon="exclamation-triangle" text="Não possuem usuários cadastrados...">
+                            <p>{this.state.searchMessageError}</p>
+                        </Alert>
                         }
-                        </tbody>
-                    </table>
-                    :
-                    <Alert color="info" title="Oops..." icon="exclamation-triangle" text="Não possuem usuários cadastrados...">
-                        <p>{this.state.searchMessageError}</p>
-                    </Alert>
+                    </div> : <Loading/>
                     }
                     
                 </Grid>

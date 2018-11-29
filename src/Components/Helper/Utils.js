@@ -32,9 +32,23 @@ import moment from 'moment'
             default:
                 return true;
         }
-       
+    }
 
-        return true;
+    resolveNameLogin(isLogin){
+        if(isLogin){
+            return "Login"
+        } else {
+            return "Cadastrar"
+        }
+    }
+
+    getUser(){
+        return localStorage.getItem('user');
+    }
+
+    getFirstName(name){
+        let nome = String(name).split(' ');
+        return nome[0];
     }
 
     ClientData(state){

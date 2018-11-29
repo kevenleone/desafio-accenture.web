@@ -4,6 +4,7 @@ import API from './Helper/API'
 import ModalBtn from './ModalBtn'
 import ModalClient from './ModalClient'
 import Utils from './Helper/Utils';
+import Loading from './Loading'
 
 export default class ClienteProfile extends Component {
 
@@ -16,6 +17,7 @@ export default class ClienteProfile extends Component {
             cpf: {value: '', valid: true},
             telefone: {value: '', valid: true},
             email: {value: '', valid: true},
+            loaded: false,
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -50,7 +52,7 @@ export default class ClienteProfile extends Component {
         let id = this.props.match.params.id;
         API.get(`/cliente/${id}`).then(data => {
             let cliente = data.data
-            this.setState({ cliente, nome:{value: cliente.nome}, nascimento: {value: cliente.nascimento}, cpf:{value: cliente.cpf}, email:{value: cliente.email}, telefone: { value: cliente.telefone} })
+            this.setState({ cliente, loaded: true, nome:{value: cliente.nome}, nascimento: {value: cliente.nascimento}, cpf:{value: cliente.cpf}, email:{value: cliente.email}, telefone: { value: cliente.telefone} })
         }).catch(err => {
             alert(err);
         })
@@ -59,7 +61,8 @@ export default class ClienteProfile extends Component {
     render() {
         return (
             <div>
-                <Grid cols="12 12 6">
+                {
+                    this.state.loaded ? <Grid cols="12 12 6">
                     <div className="jumbotron">
                         <h1 className="display-5">Cliente: {this.state.cliente.nome}!</h1>
                         <p className="lead">
@@ -75,7 +78,9 @@ export default class ClienteProfile extends Component {
                             <ModalBtn icon="pencil" color="info btn-lg" id="edtClient" text="Editar" />
                         </p>
                     </div>
-                </Grid>
+                </Grid> : <Loading />
+                }
+               
                 <ModalClient data={this.state} handleChange={this.handleChange} handleSubmit={this.handleUpdate} id="edtClient" title="Novo Cliente" />
             </div>
         )
