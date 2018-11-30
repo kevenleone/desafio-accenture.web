@@ -5,6 +5,8 @@ import ModalBtn from './ModalBtn'
 import ModalClient from './ModalClient'
 import Utils from './Helper/Utils';
 import Loading from './Loading'
+import moment from 'moment'
+
 export default class ClienteProfile extends Component {
 
     constructor() {
@@ -16,6 +18,11 @@ export default class ClienteProfile extends Component {
             cpf: {value: '', valid: true},
             telefone: {value: '', valid: true},
             email: {value: '', valid: true},
+            clientSearch : {value: ''},
+            searchMessageError: 'Não possuem clientes cadastrados na base de dados.',
+            formErrors: {nome: '', nascimento: '', telefone: '', email: '', cpf: '', form: ''},
+            clientes : [],
+            submitIsDisabled: false,
             loaded: false,
         }
 
@@ -25,10 +32,49 @@ export default class ClienteProfile extends Component {
 
     handleChange(e) {
         let target = e.target.name
+        let value = e.target.value
         let state = this.state;
-        state[target].value = e.target.value; 
-        this.setState(state)
+        state[target].value = value; 
+        this.setState(state, () => {this.validateField(target, value)})
     }
+
+
+    validateField(fieldName, value) {
+        var fieldValidationErrors = this.state.formErrors;
+        let rule, valid, rule_error
+        
+        switch(fieldName) {
+          case 'email':
+            rule = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+            rule_error = rule ? '' : `O Email ${value} está inválido`
+            break;
+          case 'nome':
+            rule = value.length >= 10;
+            rule_error = rule ? '' : "Insira o nome completo, mínimo 10 caractéres"
+            break;
+        case 'telefone':
+            let telArr = String(value).split('')
+            rule = telArr[14] !== '_';
+            rule_error = rule ? '' : 'Insira o telefone corretamente'
+            break;
+        case 'nascimento':
+            rule = moment(value).isBetween('01/01/1920', moment());
+            rule_error = rule ? '' : 'Insira uma data válida' 
+            break;
+        case 'cpf':
+            rule = value.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/);
+            rule_error = rule ? '' : 'CPF Inválido'
+            break;
+          default:
+            break;
+        }
+        valid = rule ? true: false
+        fieldValidationErrors[fieldName] = rule_error
+        let state = this.state;
+        state[fieldName].valid = valid; 
+        state[fieldName].error = rule_error; 
+        this.setState({formErrors: fieldValidationErrors, ...state}, this.validateForm);
+      }
 
     handleUpdate(e){
         let id = this.props.match.params.id;
@@ -51,7 +97,7 @@ export default class ClienteProfile extends Component {
         let id = this.props.match.params.id;
         API.get(`/cliente/${id}`).then(data => {
             let cliente = data.data
-            this.setState({ cliente, loaded: true, nome:{value: cliente.nome}, nascimento: {value: cliente.nascimento}, cpf:{value: cliente.cpf}, email:{value: cliente.email}, telefone: { value: cliente.telefone} })
+            this.setState({ cliente, loaded: true, nome:{value: cliente.nome, valid: true}, nascimento: {value: cliente.nascimento, valid: true}, cpf:{value: cliente.cpf, valid: true}, email:{value: cliente.email, valid: true}, telefone: { value: cliente.telefone, valid: true} })
         }).catch(err => {
             alert(err);
         })
@@ -80,7 +126,7 @@ export default class ClienteProfile extends Component {
                 </Grid> : <Loading />
                 }
                
-                <ModalClient data={this.state} handleChange={this.handleChange} handleSubmit={this.handleUpdate} id="edtClient" title="Novo Cliente" />
+                <ModalClient data={this.state} handleChange={this.handleChange} handleSubmit={this.handleUpdate} id="edtClient" title={`Atualização de dados de ${this.state.cliente.nome}`} />
             </div>
         )
     }

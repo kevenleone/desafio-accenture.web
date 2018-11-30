@@ -12,24 +12,29 @@ import moment from 'moment'
     }
 
     validateForm(state){
-        if(this.isValid(state.nome) && this.isValid(state.email) && this.isValid(state.cpf) && this.isValid(state.nascimento) && this.isValid(state.email)){
+        console.log(state)
+        if (state.nome.valid && state.email.valid && state.cpf.valid && state.nascimento.valid && state.email.valid){
             return true;
         } else {
             return false;
         }
     }
 
-    isValid(data, type = "str"){
-
-        if(data === "" || data === null || data === undefined){
+    isValid(data){
+        if(data === "" || data === undefined || data.length <= 2){
             return false;
-        } 
+        } else {
+            return true;
+        }
+    }
 
-        switch(type){
-            case "date":
-                return moment(data).isValid()
-            default:
-                return true;
+    getClassValidation(status){
+        if(status === ""){
+            return ''
+        } else if(status){
+            return 'valid'
+        } else {
+            return 'invalid'
         }
     }
 
@@ -43,6 +48,10 @@ import moment from 'moment'
 
     getUser(){
         return localStorage.getItem('user');
+    }
+
+    getToken(){
+        return localStorage.getItem('token');
     }
 
     isAuthenticated(){
@@ -64,6 +73,7 @@ import moment from 'moment'
         localStorage.setItem('authenticated', true);
         localStorage.setItem('user', data.usuario);
         localStorage.setItem('name', data.nome);
+        localStorage.setItem('token', data.token);
     }
 
     getFirstName(name){

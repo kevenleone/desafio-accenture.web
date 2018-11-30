@@ -6,21 +6,24 @@ import API from './Helper/API'
 import Alert from './Alert'
 import Utils from './Helper/Utils';
 import Loading from './Loading'
+import moment from 'moment'
 export default class Clientes extends Component {
 
     constructor() {
         super();
         this.state = {
-            nome: {value: '', valid: true},
-            nascimento: {value: '', valid: true},
-            cpf: {value: '', valid: true},
-            telefone: {value: '', valid: true},
-            email: {value: '', valid: true},
+            nome: {value: '', valid: ''},
+            nascimento: {value: '', valid: ''},
+            cpf: {value: '', valid: ''},
+            telefone: {value: '', valid: ''},
+            email: {value: '', valid: '', error: ''},
             clientSearch : {value: ''},
             searchMessageError: 'Não possuem clientes cadastrados na base de dados.',
-            formError: false,
+            formErrors: {nome: '', nascimento: '', telefone: '', email: '', cpf: '', form: ''},
             clientes : [],
-            loaded: false
+            submitIsDisabled: false,
+            loaded: false,
+            alert: {show: false, message: '', color: ''}
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -30,12 +33,55 @@ export default class Clientes extends Component {
     componentDidMount(){
         this.handleSearch();
     }
-    
+
+    validateField(fieldName, value) {
+        var fieldValidationErrors = this.state.formErrors;
+        let rule, valid, rule_error
+        
+        switch(fieldName) {
+          case 'email':
+            rule = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+            rule_error = rule ? '' : `O Email ${value} está inválido`
+            break;
+          case 'nome':
+            rule = value.length >= 10;
+            rule_error = rule ? '' : "Insira o nome completo, mínimo 10 caractéres"
+            break;
+        case 'telefone':
+            let telArr = String(value).split('')
+            rule = telArr[14] !== '_';
+            rule_error = rule ? '' : 'Insira o telefone corretamente'
+            break;
+        case 'nascimento':
+            rule = moment(value).isBetween('01/01/1920', moment());
+            rule_error = rule ? '' : 'Insira uma data válida' 
+            break;
+        case 'cpf':
+            rule = value.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/);
+            rule_error = rule ? '' : 'CPF Inválido'
+            break;
+          default:
+            break;
+        }
+
+        valid = rule ? true: false
+        fieldValidationErrors[fieldName] = rule_error
+        let state = this.state;
+        state[fieldName].valid = valid; 
+        state[fieldName].error = rule_error; 
+        this.setState({formErrors: fieldValidationErrors, ...state}, this.validateForm);
+      }
+
+      validateForm() {
+        this.setState({formValid: this.state.emailValid && this.state.passwordValid});
+      }
+
     handleChange(e) {
         let target = e.target.name
+        let value = e.target.value
         let state = this.state;
-        state[target].value = e.target.value; 
-        this.setState(state)
+        state[target].value = value; 
+        this.setState(state, () => {this.validateField(target, value)})
     }
 
    async handleSearch(e = null, criteria = ''){
@@ -53,29 +99,31 @@ export default class Clientes extends Component {
     }
 
     handleRemove(cliente){
-        if(window.confirm(`Tem certeza que deseja remover ${cliente.nome}?`)){
+        let cpf = window.prompt(`Para confirmar a remoção insira o CPF de ${cliente.nome}`)
+        if(cpf === cliente.cpf){
             API.delete(`/cliente/${cliente.id}`).then(data => {
                 window.location.reload();
             }).catch(err => {
                 window.location.reload();
             })
+        } else {
+            alert("CPF Inválido !");
         }
     }
 
     handleSubmit(e){
         e.preventDefault();
-        console.log(this.state.nome, this.state.email, this.state.nascimento, this.state.cpf, this.state.telefone);
-
         if(Utils.validateForm(this.state)){
+            this.setState({submitIsDisabled: true});
             API.post(`/cliente`, Utils.ClientData(this.state)).then(data => {
                 alert("Cliente Cadastrado!");
                 window.location.reload();
             }).catch(err => {
-                alert("Erro ao cadastrar Cliente...");
-                window.location.reload();
+                alert("Erro ao cadastrar Cliente... Tente novamente");
+                this.setState({submitIsDisabled: false});
             })
         } else {
-            console.log('Error validate...')
+            this.setState({submitIsDisabled: false, formErrors: {form: "Preencha o formulário corretamente"}})
         }
     }
 
@@ -109,6 +157,7 @@ export default class Clientes extends Component {
                             <thead>
                                 <tr>
                                     <th>Primeiro Nome</th>
+                                    <th>CPF</th>
                                     <th>Telefone</th>
                                     <th>E-mail</th>
                                     <th>Ações</th>
@@ -119,11 +168,12 @@ export default class Clientes extends Component {
                                 this.state.clientes.map(cliente => (
                                 <tr key={cliente.id}>
                                     <td>{Utils.getFirstName(cliente.nome)}</td>
+                                    <td>{cliente.cpf}</td>
                                     <td>{cliente.telefone}</td>
                                     <td>{cliente.email}</td>
                                     <td>
                                     <button onClick={() => Utils.Redirect(`clientes/${cliente.id}`)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
-                                    <button onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
+                                    <button data-toggle="tooltip" data-placement="top" onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 ))
@@ -143,4 +193,4 @@ export default class Clientes extends Component {
             </div>
         )
     }
-}
+} 

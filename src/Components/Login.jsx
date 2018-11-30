@@ -3,6 +3,7 @@ import './Styles/login.css'
 import Grid from './Grid'
 import Utils from './Helper/Utils'
 import API from './Helper/API'
+import Alert from './Alert'
 export default class Login extends Component {
 
     constructor() {
@@ -62,7 +63,6 @@ export default class Login extends Component {
                     })
                 } else {
                      this.setState({doubleCheckPass:false});
-                     
                 }
             } else {
                 this.setState({alertMsg: "Preencha os campos abaixo!", alertMsgColor: 'danger', doubleCheckPass: true})    
@@ -77,9 +77,7 @@ export default class Login extends Component {
                     <img alt="Accenture Logo" src="imgs/accenture.png" />
                 </div>
                 {
-                    this.state.alertMsg !== '' ? <div className={`alert alert-dismissible alert-${this.state.alertMsgColor}`}>
-                    <button type="button" className="close" data-dismiss="alert">&times;</button>
-                    {this.state.alertMsg} </div> : ''
+                    this.state.alertMsg !== '' ? <Alert color={this.state.alertMsgColor} dismiss="true"> {this.state.alertMsg} </Alert> : ''
                 }
                  {
                     !this.state.isLogin ? <div className="form-group valid">
