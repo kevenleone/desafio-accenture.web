@@ -7,5 +7,5 @@ const URLS = {
 
 // OBS, o endereço de prod está funcionando
 
-const URL = axios.create({baseURL: URLS.DEV});
+const URL = axios.create({baseURL: URLS.PROD});
 export default URL;

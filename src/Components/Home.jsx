@@ -3,10 +3,20 @@ import Grid from './Grid';
 import './Styles/styleDefault.css'
 export default () => (
     <Grid cols="12">
-        <div style={{ padding: 10 }} className="row">
-
-            <Grid cols="6">
-                <div className="wrapper"><h2>Desafio Front-End da Accenture Recife</h2>
+    <br/>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active show" data-toggle="tab" href="#desafio">Desafio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#consideracoes">Considerações</a>
+                </li>
+            </ul>
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade active show" id="desafio">
+                <Grid cols="6 12 12">
+                <div className="wrapper">
+                <br/><h2>Desafio Front-End da Accenture Recife</h2>
                     <p>O desafio proposta consiste em desenvolver uma aplicação que possibilita o cadastro de potenciais clientes de um novo produto.</p>
                     <h3><strong>Requisitos funcionais</strong></h3>
                     <ul>
@@ -42,9 +52,10 @@ export default () => (
                         <li className="orange">Talvez / Em partes</li>
                     </ul>
                 </div>
-
             </Grid>
-            <Grid cols="6">
+                </div>
+                <div class="tab-pane fade" id="consideracoes">
+                <Grid cols="6"> <br />
                 <h2>Observações e Considerações</h2>
                 <p>Para realização do projeto foram utilizadas algumas ferramentas extras para dar apoio ao Front-end servindo as informações, um back-end foi criado para isso utilizando: </p>
                 <ul>
@@ -81,7 +92,7 @@ export default () => (
                 </ul>
 
             </Grid>
-        </div>
-
+                </div>
+            </div>
     </Grid>
 )

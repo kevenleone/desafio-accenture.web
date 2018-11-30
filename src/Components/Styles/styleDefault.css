@@ -39,7 +39,7 @@ body {
   stroke-miterlimit: 10;
   stroke-linecap: round;
   animation: loading-circle 2s linear infinite;
-  stroke: #51BBA7;
+  stroke: #593196 ;
   fill: transparent;
 }
 

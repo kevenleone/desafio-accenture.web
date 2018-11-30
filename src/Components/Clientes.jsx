@@ -100,14 +100,16 @@ export default class Clientes extends Component {
 
     handleRemove(cliente){
         let cpf = window.prompt(`Para confirmar a remoção insira o CPF de ${cliente.nome}`)
+        console.log(cpf)
         if(cpf === cliente.cpf){
             API.delete(`/cliente/${cliente.id}`).then(data => {
                 window.location.reload();
             }).catch(err => {
                 window.location.reload();
             })
-        } else {
-            alert("CPF Inválido !");
+        } else if(cpf == null) {} 
+        else {
+            alert(`O CPF informado não é igual ao de ${cliente.nome}`);
         }
     }
 
@@ -129,14 +131,14 @@ export default class Clientes extends Component {
 
     render() {
         return (
-            <div>
+            <div> <br />
                 <Grid cols="12">
                     <div className="jumbotron">
                         <h3 className="display-5">Bem vindo, {Utils.getUser()}</h3>
                         <p className="lead">A partir dessa página você poderá gerenciar o perfil dos clientes, cadastrar, remover e altera-los.</p>
                     </div>
                 </Grid>
-                <Grid cols="12 12 6">
+                <Grid cols="12 12 12">
                     <div className="row">
                     <Grid cols="10">
                         <ModalBTN color="primary" icon="user" text="Novo Cliente" id="client" /> <br /> <br />
@@ -145,7 +147,7 @@ export default class Clientes extends Component {
                     <div className="form-group mx-sm-3 mb-2">
                         <input type="text" value={this.state.clientSearch.value} name="clientSearch" onChange={this.handleChange} className="form-control col-md-12" placeholder="ex: Cirilo"/>
                     </div>
-                    <button onClick={(e) => this.handleSearch(e, this.state.clientSearch.value)}  className="btn btn-primary mb-2">Buscar</button>
+                    <button onClick={(e) => this.handleSearch(e, this.state.clientSearch.value)} className="btn btn-primary mb-2"><i className="fa fa-search"></i> Buscar</button>
                     </form>
                     
                     </div>
