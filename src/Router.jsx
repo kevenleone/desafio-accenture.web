@@ -19,11 +19,24 @@ const PrivateRoute = ({component: Component, ...rest}) => (
     )} />
 )
 
+
+const PublicRoute = ({component: Component, ...rest}) => (
+    <Route {...rest} render={props => (
+        Authenticated() ? (
+            <Redirect to={{pathname: '/inicio', state: {from: props.location}}}></Redirect>
+        ) : (
+            <Component {...props} />
+        )
+    )} />
+)
+
+
 export default () => (
     <BrowserRouter>
         <Switch>
-            <Route exact path="/" component={Login} />
-            <Route exact path="/home" component={Home} />
+            <PublicRoute exact path="/" component={Login} />
+            {/* <Route exact path="/" component={Login} /> */}
+            <PrivateRoute exact path="/inicio" component={Home} />
             <PrivateRoute exact path="/clientes" component={Clientes} />
             <PrivateRoute exact path="/clientes/:id" component={ClienteProfile} />
         </Switch>

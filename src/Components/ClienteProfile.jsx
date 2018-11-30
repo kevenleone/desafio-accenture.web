@@ -5,7 +5,6 @@ import ModalBtn from './ModalBtn'
 import ModalClient from './ModalClient'
 import Utils from './Helper/Utils';
 import Loading from './Loading'
-
 export default class ClienteProfile extends Component {
 
     constructor() {
@@ -64,7 +63,7 @@ export default class ClienteProfile extends Component {
                 {
                     this.state.loaded ? <Grid cols="12 12 6">
                     <div className="jumbotron">
-                        <h1 className="display-5">Cliente: {this.state.cliente.nome}!</h1>
+                        <h5>Cliente: {this.state.cliente.nome}!</h5>
                         <p className="lead">
                             <b>E-mail</b>: {this.state.cliente.email} <br />
                             <b>Idade:</b> {Utils.getAnoCliente(this.state.cliente.nascimento)} anos<br />

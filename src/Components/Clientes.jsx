@@ -79,10 +79,6 @@ export default class Clientes extends Component {
         }
     }
 
-    Goto(cliente){
-        window.location.href = `clientes/${cliente.id}`
-    }
-
     render() {
         return (
             <div>
@@ -126,7 +122,7 @@ export default class Clientes extends Component {
                                     <td>{cliente.telefone}</td>
                                     <td>{cliente.email}</td>
                                     <td>
-                                    <button onClick={() => this.Goto(cliente)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
+                                    <button onClick={() => Utils.Redirect(`clientes/${cliente.id}`)} className="btn btn-info" title="Visualizar Cliente"><i className="fa fa-user"></i></button> &ensp;
                                     <button onClick={() => this.handleRemove(cliente)} className="btn btn-danger" title="Remover"><i className="fa fa-trash"></i></button>
                                     </td>
                                 </tr>

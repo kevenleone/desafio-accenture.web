@@ -19,7 +19,7 @@ import moment from 'moment'
         }
     }
 
-    isValid(data, type){
+    isValid(data, type = "str"){
 
         if(data === "" || data === null || data === undefined){
             return false;
@@ -28,7 +28,6 @@ import moment from 'moment'
         switch(type){
             case "date":
                 return moment(data).isValid()
-                break;
             default:
                 return true;
         }
@@ -44,6 +43,27 @@ import moment from 'moment'
 
     getUser(){
         return localStorage.getItem('user');
+    }
+
+    isAuthenticated(){
+        return localStorage.getItem('authenticated');
+    }
+
+    Redirect(path){
+        window.location.href = path
+    }
+
+    Logout(e){
+        e.preventDefault();
+        localStorage.removeItem('user');
+        localStorage.removeItem('authenticated');
+        this.Redirect('/')
+    }
+
+    setUserSession(data){
+        localStorage.setItem('authenticated', true);
+        localStorage.setItem('user', data.usuario);
+        localStorage.setItem('name', data.nome);
     }
 
     getFirstName(name){

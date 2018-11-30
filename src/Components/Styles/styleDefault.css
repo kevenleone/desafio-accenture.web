@@ -16,6 +16,18 @@ body {
   color: #8E8E8E;
 }
 
+.green{
+  color: #28a745
+}
+
+.red{
+  color: #dc3545
+}
+
+.orange {
+  color: #e2850a
+}
+
 #load {
   width: 150px;
   animation: loading 3s linear infinite;

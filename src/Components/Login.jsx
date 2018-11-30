@@ -8,12 +8,15 @@ export default class Login extends Component {
     constructor() {
         super();
         this.state = {
+            nome: { value: '', valid: null, alert: '' },
             usuario: { value: '', valid: null, alert: '' },
             senha: { value: '', valid: null, alert: '' },
+            senha2: { value: ''},
             isLogin: true,
-            alertMsg: ''
+            alertMsg: '',
+            alertMsgColor: 'danger',
+            doubleCheckPass: true
         }
-
         this.handleChange = this.handleChange.bind(this);
         this.changePageType = this.changePageType.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -32,75 +35,75 @@ export default class Login extends Component {
     }
 
     handleSubmit() {
-        let data = { usuario: this.state.usuario.value, senha: this.state.senha.value }
+        var data = { usuario: this.state.usuario.value, senha: this.state.senha.value, nome: this.state.nome.value }
+        let validateInputs = Utils.isValid(data.usuario) && Utils.isValid(data.senha)
         if (this.state.isLogin) {
-            API.post('/auth/login', data).then(data => {
-                let total = data.data.count
-                if (total === 1) {
-                    localStorage.setItem('user', data.data.rows[0].usuario)
-                    localStorage.setItem('authenticated', true);
-                    window.location.href = "/home"
+            if(validateInputs){
+                API.post('/auth/login', data).then(data => {
+                    if (data.data.count === 1) {
+                        Utils.setUserSession(data.data.rows[0])
+                        Utils.Redirect('/inicio')
+                    } else {
+                        this.setState({alertMsg: "Usuário ou senha inválida", alertMsgColor: 'danger'})
+                    }
+                }).catch(err => {
+                    console.log(err)
+                })
+            } else {
+                this.setState({alertMsg: "Preencha Usuário e Senha!", alertMsgColor: 'danger'})                
+            }
+        } else { //register
+            if(validateInputs){
+                if(Utils.isValid(data.senha) && Utils.isValid(this.state.nome.value) && data.senha === this.state.senha2.value){
+                    API.post('/auth/register', data).then(data => {
+                        this.setState({alertMsg: `Cadastro realizado com sucesso!`, alertMsgColor: 'success', isLogin: true})                
+                    }).catch(err => {
+                        this.setState({alertMsg: "Usuário já existe, escolha outro!", alertMsgColor: 'danger'})                
+                    })
                 } else {
-                    this.setState({alertMsg: "Usuário ou senha inválida"})
+                     this.setState({doubleCheckPass:false});
+                     
                 }
-            }).catch(err => {
-                console.log(err)
-            })
-        } else {
-            API.post('/auth/register', data).then(data => {
-                console.log(data)
-                localStorage.setItem('authenticated', true);
-                // window.location.href = "/home"
-            }).catch(err => {
-                console.log(err);
-            })
+            } else {
+                this.setState({alertMsg: "Preencha os campos abaixo!", alertMsgColor: 'danger', doubleCheckPass: true})    
+            }
         }
-
     }
-
 
     render() {
         return (
             <Grid cols="12" classes="loginPanel">
-
                 <div className="text-center">
                     <img alt="Accenture Logo" src="imgs/accenture.png" />
                 </div>
                 {
-                    this.state.alertMsg !== '' ? <div className="alert alert-dismissible alert-danger">
+                    this.state.alertMsg !== '' ? <div className={`alert alert-dismissible alert-${this.state.alertMsgColor}`}>
                     <button type="button" className="close" data-dismiss="alert">&times;</button>
-                    <strong>Oops!</strong> {this.state.alertMsg} </div> : ''
+                    {this.state.alertMsg} </div> : ''
                 }
-               
+                 {
+                    !this.state.isLogin ? <div className="form-group valid">
+                        <input name="nome" value={this.state.nome.value} type="text" className="form-control" onChange={(e) => this.handleChange(e)} placeholder="Nome Completo" /> </div> : ''
+                }
                 <div className="form-group">
                     <input name="usuario" value={this.state.usuario.value} type="text" className={"form-control"} onChange={(e) => this.handleChange(e)} placeholder="Usuário" />
-                    {
-                        this.state.usuario.alert !== '' ? <div className="alert-error">{this.state.usuario.alert}</div> : ''
-                    }
-
                 </div>
-                <div className="form-group valid">
+                <div className="form-group">
                     <input name="senha" value={this.state.senha.value} type="password" className="form-control" onChange={(e) => this.handleChange(e)} placeholder="Senha" />
-                    {
-                        this.state.senha.alert !== '' ? <div className="alert-error">{this.state.senha.alert}</div> : ''
-                    }
                 </div>
-
                 {
                     !this.state.isLogin ? <div className="form-group valid">
-                        <input name="senha" value={this.state.senha.value} type="password" className="form-control" onChange={(e) => this.handleChange(e)} placeholder="Repita a Senha" />
+                        <input name="senha2" value={this.state.senha2.value} type="password" className="form-control" onChange={(e) => this.handleChange(e)} placeholder="Repita a Senha" />
                         {
-                            this.state.senha.alert !== '' ? <div className="alert-error">{this.state.senha.alert}</div> : ''
+                            !this.state.doubleCheckPass ? <div className="alert-error">As senhas informadas não são iguais</div> : ''
                         }
                     </div> : ''
                 }
-
                 <button onClick={this.handleSubmit} className="btn btn-primary btn-block btn-lg"> {Utils.resolveNameLogin(this.state.isLogin)} </button> <br />
                 {
                     this.state.isLogin ? <div className="text-center">Ainda não é cadastrado? <a href="/register" onClick={this.changePageType}>Cadastre-se</a></div>
                         : <div className="text-center">Já é cadastrado? <a href="/" onClick={this.changePageType}>Login</a></div>
                 }
-
             </Grid>
 
         )
