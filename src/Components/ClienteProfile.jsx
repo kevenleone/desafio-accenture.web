@@ -106,12 +106,11 @@ export default class ClienteProfile extends Component {
         return (
             <div style={{ padding: 10 }}>
                 {
-                    this.state.loaded ? <Grid cols="7 12 12">
-
-                        <div className="card border-primary mb-3" style={{ maxWidth: '60rem' }}>
+                    this.state.loaded ? <Grid cols="12 12 12">
+                        <div className="card border-primary mb-3">
                             <div className="card-header">{this.state.cliente.nome}</div>
                             <div className="card-body">
-                                <h4 className="card-title">Dados do Cliente</h4>
+                                <p className="card-title">Dados do Cliente</p>
                                 <p className="card-text">
                                     <b>E-mail</b>: {this.state.cliente.email} <br />
                                     <b>Idade:</b> {Utils.getAnoCliente(this.state.cliente.nascimento)} anos<br />
