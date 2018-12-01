@@ -1,31 +1,35 @@
 <img src="https://travis-ci.org/kevenleone/desafio-accenture.web.svg?branch=master"></img>
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-## Available Scripts
+## Scripts Disponíveis
 
-In the project directory, you can run:
+Para executar a aplicação em DEV abra o diretório da aplicação e execute:
 
 ### `npm start`
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Após executar o comando a aplicação se iniciará no modo de desenvolvimento.<br>
+Abra [http://localhost:3000](http://localhost:3000) para ver no navegador.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+A página irá recarregar após alterações.<br>
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
+Para build da aplicação em modo de produção utilize:
 ### `npm run build`
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+O build é importante para uso em produção e se tem uma melhor performance
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+#OBS
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+A aplicação necessita dos dados de uma API, criada por mim para prover as informações necessárias no desafio, o link 
+[https://github.com/kevenleone/desafio-accenture-api](https://github.com/kevenleone/desafio-accenture-api) as introções para execução se encontram no repositório da API.
+
+Caso não seja possível executar o back-end não tem problema, essa aplicação dentro de src/Helper/API.js por padrão a API a ser utilizada está hospedada no Heroku, tanto API / WEB o link [https://desafio-accenture-k.herokuapp.com/](https://desafio-accenture-k.herokuapp.com/) (A página principal é a do desafio web).
+
+Outras instruções se encontram na página inicial (Pós Login)
+
+#OBS2 
+
+Para utilizar a aplicação é preciso fazer um login / cadastra caso não possua. 
+
+
 # desafio-accenture.web
 

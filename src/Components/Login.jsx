@@ -16,7 +16,9 @@ export default class Login extends Component {
             isLogin: true,
             alertMsg: '',
             alertMsgColor: 'danger',
-            doubleCheckPass: true
+            doubleCheckPass: true,
+            submitIsDisabled: false
+            
         }
         this.handleChange = this.handleChange.bind(this);
         this.changePageType = this.changePageType.bind(this);
@@ -40,15 +42,17 @@ export default class Login extends Component {
         let validateInputs = Utils.isValid(data.usuario) && Utils.isValid(data.senha)
         if (this.state.isLogin) {
             if(validateInputs){
+                this.setState({submitIsDisabled: true});
                 API.post('/auth/login', data).then(data => {
                     if (data.data.count === 1) {
                         Utils.setUserSession(data.data.rows[0])
                         Utils.Redirect('/inicio')
                     } else {
-                        this.setState({alertMsg: "Usuário ou senha inválida", alertMsgColor: 'danger'})
+                        this.setState({alertMsg: "Usuário ou senha inválida", alertMsgColor: 'danger', submitIsDisabled: false})
                     }
                 }).catch(err => {
                     console.log(err)
+                    this.setState({submitIsDisabled: true});
                 })
             } else {
                 this.setState({alertMsg: "Preencha Usuário e Senha!", alertMsgColor: 'danger'})                
@@ -56,13 +60,14 @@ export default class Login extends Component {
         } else { //register
             if(validateInputs){
                 if(Utils.isValid(data.senha) && Utils.isValid(this.state.nome.value) && data.senha === this.state.senha2.value){
+                    this.setState({submitIsDisabled: true});
                     API.post('/auth/register', data).then(data => {
-                        this.setState({alertMsg: `Cadastro realizado com sucesso!`, alertMsgColor: 'success', isLogin: true})                
+                        this.setState({alertMsg: `Cadastro realizado com sucesso!`, alertMsgColor: 'success', isLogin: true, submitIsDisabled: false})                
                     }).catch(err => {
-                        this.setState({alertMsg: "Usuário já existe, escolha outro!", alertMsgColor: 'danger'})                
+                        this.setState({alertMsg: "Usuário já existe, escolha outro!", alertMsgColor: 'danger', submitIsDisabled: false})                
                     })
                 } else {
-                     this.setState({doubleCheckPass:false});
+                     this.setState({doubleCheckPass:false, submitIsDisabled: false});
                 }
             } else {
                 this.setState({alertMsg: "Preencha os campos abaixo!", alertMsgColor: 'danger', doubleCheckPass: true})    
@@ -77,7 +82,7 @@ export default class Login extends Component {
                     <img alt="Accenture Logo" src="imgs/accenture.png" />
                 </div>
                 {
-                    this.state.alertMsg !== '' ? <Alert color={this.state.alertMsgColor} dismiss="true"> {this.state.alertMsg} </Alert> : ''
+                    this.state.alertMsg !== '' ? <Alert color={this.state.alertMsgColor}> {this.state.alertMsg} </Alert> : ''
                 }
                  {
                     !this.state.isLogin ? <div className="form-group valid">
@@ -97,13 +102,12 @@ export default class Login extends Component {
                         }
                     </div> : ''
                 }
-                <button onClick={this.handleSubmit} className="btn btn-primary btn-block btn-lg"> {Utils.resolveNameLogin(this.state.isLogin)} </button> <br />
+                <button onClick={this.handleSubmit} disabled={this.state.submitIsDisabled} className="btn btn-primary btn-block btn-lg"> {Utils.resolveNameLogin(this.state.isLogin)} </button> <br />
                 {
                     this.state.isLogin ? <div className="text-center">Ainda não é cadastrado? <a href="/register" onClick={this.changePageType}>Cadastre-se</a></div>
                         : <div className="text-center">Já é cadastrado? <a href="/" onClick={this.changePageType}>Login</a></div>
                 }
             </Grid>
-
         )
     }
 }

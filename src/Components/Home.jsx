@@ -4,16 +4,16 @@ import './Styles/styleDefault.css'
 export default () => (
     <Grid cols="12">
     <br/>
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active show" data-toggle="tab" href="#desafio">Desafio</a>
+            <ul className="nav nav-tabs">
+                <li className="nav-item">
+                    <a className="nav-link active show" data-toggle="tab" href="#desafio">Desafio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#consideracoes">Considerações</a>
+                <li className="nav-item">
+                    <a className="nav-link" data-toggle="tab" href="#consideracoes">Considerações</a>
                 </li>
             </ul>
-            <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade active show" id="desafio">
+            <div id="myTabContent" className="tab-content">
+                <div className="tab-pane fade active show" id="desafio">
                 <Grid cols="6 12 12">
                 <div className="wrapper">
                 <br/><h2>Desafio Front-End da Accenture Recife</h2>
@@ -54,7 +54,7 @@ export default () => (
                 </div>
             </Grid>
                 </div>
-                <div class="tab-pane fade" id="consideracoes">
+                <div className="tab-pane fade" id="consideracoes">
                 <Grid cols="6"> <br />
                 <h2>Observações e Considerações</h2>
                 <p>Para realização do projeto foram utilizadas algumas ferramentas extras para dar apoio ao Front-end servindo as informações, um back-end foi criado para isso utilizando: </p>
@@ -64,7 +64,7 @@ export default () => (
                     <li>Body-Parser</li>
                     <li>UUID</li>
                     <li>DOTENV</li>
-                    <li>TokenJWT</li>
+                    <li><s>TokenJWT</s></li>
                 </ul>
 
                 <b>OBS¹: Caso não seja possível a inicialização do back-end local pode se utilizar a API rodando no Heroku pelo arquivo API.JS</b> <br />
